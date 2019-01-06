@@ -122,10 +122,36 @@ static const OtSpanContext *findSpanContext(
   for (auto &reference : references) {
     if (auto span_context =
             dynamic_cast<const OtSpanContext *>(reference.second)) {
-      return span_context;
+	if(reference.first==ot::SpanReferenceType::ChildOfRef||reference.first==ot::SpanReferenceType::FollowsFromRef){
+		return span_context;
+	}
+	else{
+	return nullptr;
+	}
+	
     }
   }
   return nullptr;
+}
+
+static const OtSpanContext *findSelfSpanContext(
+     const std::vector<std::pair<ot::SpanReferenceType, const ot::SpanContext *>>
+        &references) {
+     for (auto &reference : references) {
+         if (auto span_context =
+            dynamic_cast<const OtSpanContext *>(reference.second)) {
+                 if(reference.first==ot::SpanReferenceType::SelfRef){
+                return span_context;
+             }
+             else{
+             return nullptr;
+             }
+        
+        }
+  }
+  return nullptr;
+
+	
 }
 
 class OtSpan : public ot::Span {
@@ -135,14 +161,21 @@ public:
       : tracer_{std::move(tracer_owner)}, endpoint_{std::move(endpoint)},
         span_{std::move(span_owner)} {
     auto parent_span_context = findSpanContext(options.references);
-
+    auto self_span_context   = findSelfSpanContext(options.references);
     // Set IDs.
-    span_->setId(RandomUtil::generateId());
+   // span_->setId(RandomUtil::generateId());
     if (parent_span_context) {
       span_->setTraceId(parent_span_context->span_context_.trace_id());
       span_->setParentId(parent_span_context->span_context_.id());
-    } else {
+      span_->setId(RandomUtil::generateId());
+    }else if (self_span_context){
+      span_->setTraceId(self_span_context->span_context_.trace_id());
+      span_->setParentId(self_span_context->span_context_.parent_id());
+      span_->setId(self_span_context->span_context_.id());
+   } 
+     else {
       span_->setTraceId(RandomUtil::generateId());
+      span_->setId(RandomUtil::generateId());
     }
 
     // Set timestamp.
