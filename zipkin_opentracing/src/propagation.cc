@@ -8,17 +8,17 @@
 namespace ot = opentracing;
 
 namespace zipkin {
-#define PREFIX_TRACER_STATE "x-b3-"
+#define PREFIX_TRACER_STATE "X-B3-"
 // Note: these constants are a convention of the OpenTracing basictracers.
 const ot::string_view prefix_baggage = "ot-baggage-";
 
 const int tracer_state_required_field_count = 2;
-const ot::string_view zipkin_trace_id = PREFIX_TRACER_STATE "traceid";
-const ot::string_view zipkin_span_id = PREFIX_TRACER_STATE "spanid";
+const ot::string_view zipkin_trace_id = PREFIX_TRACER_STATE "TraceId";
+const ot::string_view zipkin_span_id = PREFIX_TRACER_STATE "SpanId";
 const ot::string_view zipkin_parent_span_id =
-    PREFIX_TRACER_STATE "parentspanid";
-const ot::string_view zipkin_sampled = PREFIX_TRACER_STATE "sampled";
-const ot::string_view zipkin_flags = PREFIX_TRACER_STATE "flags";
+    PREFIX_TRACER_STATE "ParentSpanId";
+const ot::string_view zipkin_sampled = PREFIX_TRACER_STATE "Sampled";
+const ot::string_view zipkin_flags = PREFIX_TRACER_STATE "Flags";
 #undef PREFIX_TRACER_STATE
 
 static bool keyCompare(ot::string_view lhs, ot::string_view rhs) {
